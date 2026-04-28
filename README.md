@@ -1,0 +1,89 @@
+# RIME Standalone
+I kinda thought it was a bummer that I wasnt able to use Nuemann RIME standalone on windows. I wanted it to work with Youtube, Media Players, games with surround sound support, etc.
+This experimental project allows the Nuemann RIME VST3 to process audio from windows via APO, with secondary input from VB-CABLE output for surround sound.
+
+You will need Nuemann RIME installed on the default C drive path, or have to set a custom path if it is elsewhere. [Neumann RIME](https://www.neumann.com/rime)
+This project allows RIME to be used without a DAW. You will still need to own RIME
+
+## Quick Install
+
+1. **Build the project** (requires CMake + Visual Studio 2022):
+   ```powershell
+   cmake -S . -B build -G "Visual Studio 17 2022"
+   cmake --build build --config Release
+   ```
+
+2. **Run the installer** (as Administrator):
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File Install.ps1
+   ```
+   This will:
+   - Copy `rime_apo.dll` to System32 and `rime_bridge.exe` to Program Files
+   - Register the APO COM server
+   - Let you choose which audio device to apply RIME to
+   - Create a config file at `%APPDATA%\RIME Standalone\config.json`
+   - Register the bridge to launch automatically on login
+
+3. **That's it.** The bridge will start automatically and the RIME UI will appear.
+
+## Surround Sound support
+Surround support requires the use of VB-CABLE and the Input and Output must be set to 8 channel 16 bit 48000 hz.
+Note, that not all games appear to support funnelling surround sound through VB-CABLE.
+
+Game like Halo MCC, and Pragmata seemed to work. But games like Mirrors Edge 2009, and NieR Replicant ver.1.22474487139… did not despite having advertised surround support.
+I suspect its because VB-Cable doesnt explicitly say its a surround sound device. It simply supports up to 16 channel audio. Different games query this audio device info differently.
+
+Long term may have to make our own passthrough driver that advertises 5.1/7.1 surround sound input in addition to the 16 channel audio support.
+
+## Uninstall
+
+```powershell
+powershell -ExecutionPolicy Bypass -File Install.ps1 -Uninstall
+```
+
+## Configuration
+
+Edit `%APPDATA%\RIME Standalone\config.json`:
+
+```json
+{
+  "pluginPath": "C:\\Program Files\\Common Files\\VST3\\Neumann RIME.vst3\\Contents\\x86_64-win\\Neumann RIME.vst3",
+  "sampleRate": 48000,
+  "outputGainDb": 4.0
+}
+```
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `pluginPath` | *(Neumann RIME default)* | Path to the VST3 plugin binary |
+| `sampleRate` | `48000` | Sample rate in Hz |
+| `outputGainDb` | `4.0` | Output gain compensation in dB (compensates for volume reduction from spatial processing) |
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Windows Audio Engine (audiodg.exe)                     │
+│  ┌────────────┐    Shared Memory IPC    ┌────────────┐  │
+│  │  rime_apo   │◄──────────────────────►│rime_bridge │  │
+│  │  (APO DLL)  │  Ring Buffers + Events │ (VST3 Host)│  │
+│  └────────────┘                         └────────────┘  │
+│        │                                      │         │
+│   Audio In/Out                          RIME VST3       │
+│   (per-device)                          Processing      │
+└─────────────────────────────────────────────────────────┘
+```
+
+- **rime_apo.dll** — Loaded by Windows into `audiodg.exe`. Intercepts audio and pipes it through shared memory. Only one instance claims the IPC channel; others passthrough.
+- **rime_bridge.exe** — User-space process that hosts the RIME VST3 plugin. Reads audio from the APO, processes it, and sends it back. Runs with MMCSS "Pro Audio" thread priority.
+
+## Latency
+
+The round-trip latency is ~10ms (one WASAPI period at 48kHz). Processing time is ~0.5ms per block.
+
+## Requirements
+
+- Windows 10/11 (64-bit)
+- [Neumann RIME VST3 plugin](https://www.neumann.com/rime) installed
+- Administrator privileges (for APO installation)
+- Visual Studio 2022 Build Tools (for building from source)

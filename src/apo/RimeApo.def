@@ -1,0 +1,4 @@
+LIBRARY "rime_apo"
+EXPORTS
+    DllCanUnloadNow         PRIVATE
+    DllGetClassObject       PRIVATE
