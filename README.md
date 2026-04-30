@@ -30,7 +30,7 @@ This project allows RIME to be used without a DAW. You will still need to own RI
 Surround support requires the use of VB-CABLE and the Input and Output must be set to 8 channel 16 bit 48000 hz.
 Note, that not all games appear to support funnelling surround sound through VB-CABLE.
 
-Game like Halo MCC, and Pragmata seemed to work. But games like Mirrors Edge 2009, and NieR Replicant ver.1.22474487139… did not despite having advertised surround support.
+Game like Halo MCC, FFXIV and Pragmata seemed to work. But games like Mirrors Edge 2009, and NieR Replicant ver.1.22474487139… did not despite having advertised surround support.
 I suspect its because VB-Cable doesnt explicitly say its a surround sound device. It simply supports up to 16 channel audio. Different games query this audio device info differently.
 
 Long term may have to make our own passthrough driver that advertises 5.1/7.1 surround sound input in addition to the 16 channel audio support.
