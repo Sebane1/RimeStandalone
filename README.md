@@ -1,8 +1,8 @@
 # RIME Standalone
-I kinda thought it was a bummer that I wasnt able to use Nuemann RIME standalone on windows. I wanted it to work with Youtube, Media Players, games with surround sound support, etc.
+I kinda thought it was a bummer that I wasnt able to use Neumann RIME standalone on windows. I wanted it to work with Youtube, Media Players, games with surround sound support, etc.
 This experimental project allows the Nuemann RIME VST3 to process audio from windows via APO, with secondary input from VB-CABLE output for surround sound.
 
-You will need Nuemann RIME installed on the default C drive path, or have to set a custom path if it is elsewhere. [Neumann RIME](https://www.neumann.com/rime)
+You will need [Neumann RIME](https://www.neumann.com/rime) installed on the default C drive path, or have to set a custom path if it is elsewhere.
 This project allows RIME to be used without a DAW. You will still need to own RIME
 
 ## Quick Install
@@ -30,6 +30,22 @@ Whenever the bridge launches, it automatically queries the Windows Registry to p
 ## Uninstall
 
 Simply run `rime_setup.exe` again and click the **Uninstall** button. It will cleanly remove the APO from your headphones, unregister all COM servers, and remove the background startup tasks.
+## Uninstall
+
+```powershell
+powershell -ExecutionPolicy Bypass -File Install.ps1 -Uninstall
+```
+## Surround Sound support
+Surround support requires the use of VB-CABLE and the Input and Output must be set to 8 channel 16 bit 48000 hz.
+Note, that not all games appear to support funnelling surround sound through VB-CABLE.
+
+Game like Halo MCC, FFXIV and Pragmata seemed to work. But games like Mirrors Edge 2009, and NieR Replicant ver.1.22474487139… did not despite having advertised surround support.
+I suspect its because VB-Cable doesnt explicitly say its a surround sound device. It simply supports up to 16 channel audio. Different games query this audio device info differently.
+
+Long term may have to make our own passthrough driver that advertises 5.1/7.1 surround sound input in addition to the 16 channel audio support.
+
+## Head Tracking
+I have added support to automatically read head tracking data from SlimeVR server and forward it to RIME. SlimeVR uses IMU based trackers that can be easily strapped to the top of headphones or other joints of the body.
 
 ## Configuration
 
