@@ -1,5 +1,5 @@
 # RIME Standalone
-I kinda thought it was a bummer that I wasnt able to use Nuemann RIME standalone on windows. I wanted it to work with Youtube, Media Players, games with surround sound support, etc.
+I kinda thought it was a bummer that I wasnt able to use Neumann RIME standalone on windows. I wanted it to work with Youtube, Media Players, games with surround sound support, etc.
 This experimental project allows the Nuemann RIME VST3 to process audio from windows via APO, with secondary input from VB-CABLE output for surround sound.
 
 You will need [Neumann RIME](https://www.neumann.com/rime) installed on the default C drive path, or have to set a custom path if it is elsewhere.
