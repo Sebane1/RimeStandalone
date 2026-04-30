@@ -26,6 +26,11 @@ This project allows RIME to be used without a DAW. You will still need to own RI
 
 3. **That's it.** The bridge will start automatically and the RIME UI will appear.
 
+## Uninstall
+
+```powershell
+powershell -ExecutionPolicy Bypass -File Install.ps1 -Uninstall
+```
 ## Surround Sound support
 Surround support requires the use of VB-CABLE and the Input and Output must be set to 8 channel 16 bit 48000 hz.
 Note, that not all games appear to support funnelling surround sound through VB-CABLE.
@@ -35,11 +40,8 @@ I suspect its because VB-Cable doesnt explicitly say its a surround sound device
 
 Long term may have to make our own passthrough driver that advertises 5.1/7.1 surround sound input in addition to the 16 channel audio support.
 
-## Uninstall
-
-```powershell
-powershell -ExecutionPolicy Bypass -File Install.ps1 -Uninstall
-```
+## Head Tracking
+I have added support to automatically read head tracking data from SlimeVR server and forward it to RIME. SlimeVR uses IMU based trackers that can be easily strapped to the top of headphones or other joints of the body.
 
 ## Configuration
 
