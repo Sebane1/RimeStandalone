@@ -60,6 +60,27 @@ static bool FileExists(const std::wstring& path) {
     return GetFileAttributesW(path.c_str()) != INVALID_FILE_ATTRIBUTES;
 }
 
+static void InstallVBCable() {
+    std::wstring exeDir = GetExeDir();
+    std::wstring vbSetup = exeDir + L"\\VBCABLE\\VBCABLE_Setup_x64.exe";
+    if (FileExists(vbSetup)) {
+        SetStatus(L"Installing VB-Audio Virtual Cable (Please wait)...");
+        
+        SHELLEXECUTEINFOW sei = { sizeof(sei) };
+        sei.fMask = SEE_MASK_NOCLOSEPROCESS;
+        sei.hwnd = g_hWnd;
+        sei.lpVerb = L"runas";
+        sei.lpFile = vbSetup.c_str();
+        sei.lpParameters = L"-i -h";
+        sei.nShow = SW_HIDE;
+        
+        if (ShellExecuteExW(&sei)) {
+            WaitForSingleObject(sei.hProcess, INFINITE);
+            CloseHandle(sei.hProcess);
+        }
+    }
+}
+
 static void RestartAudioService() {
     SetStatus(L"Restarting Windows Audio Service...");
     SC_HANDLE scm = OpenSCManagerW(NULL, NULL, SC_MANAGER_ALL_ACCESS);
@@ -229,18 +250,22 @@ static void DoInstall(int deviceIndex) {
     }
 
     // 1. Stop service & copy files
-    SetStatus(L"[1/6] Copying files...");
+    SetStatus(L"[1/7] Copying files...");
     RestartAudioService(); // stop first
     CreateDirectoryW(installDir.c_str(), NULL);
     CopyFileW(dllSrc.c_str(), dllDst.c_str(), FALSE);
     CopyFileW(bridgeSrc.c_str(), bridgeDst.c_str(), FALSE);
 
-    // 2. APO signing bypass
-    SetStatus(L"[2/6] Disabling APO signing enforcement...");
+    // 2. Install VB-Cable
+    SetStatus(L"[2/7] Installing VB-Audio Virtual Cable...");
+    InstallVBCable();
+
+    // 3. APO signing bypass
+    SetStatus(L"[3/7] Disabling APO signing enforcement...");
     RegSetDword(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Audio", L"DisableProtectedAudioDG", 1);
 
-    // 3. Register COM
-    SetStatus(L"[3/6] Registering APO COM server...");
+    // 4. Register COM
+    SetStatus(L"[4/7] Registering APO COM server...");
     std::wstring clsidPath = std::wstring(L"SOFTWARE\\Classes\\CLSID\\") + APO_CLSID;
     std::wstring inprocPath = clsidPath + L"\\InProcServer32";
     RegSetString(HKEY_LOCAL_MACHINE, clsidPath.c_str(), NULL, L"Rime Audio Processing Object");
@@ -268,9 +293,9 @@ static void DoInstall(int deviceIndex) {
         RegSetString(HKEY_LOCAL_MACHINE, apoPath.c_str(), L"APOInterface0", APO_IFACE);
     }
 
-    // 4. Install on selected device
+    // 5. Install on selected device
     if (deviceIndex >= 0 && deviceIndex < (int)g_devices.size()) {
-        SetStatus(L"[4/6] Installing APO on device...");
+        SetStatus(L"[5/7] Installing APO on device...");
         auto& dev = g_devices[deviceIndex];
         UnlockFxProperties(dev.id.c_str());
 
@@ -281,8 +306,8 @@ static void DoInstall(int deviceIndex) {
         RegCloseKey(hk);
     }
 
-    // 5. Create config
-    SetStatus(L"[5/6] Creating configuration...");
+    // 6. Create config
+    SetStatus(L"[6/7] Creating configuration...");
     std::wstring configDir = GetConfigDir();
     CreateDirectoryW(configDir.c_str(), NULL);
     std::wstring configFile = configDir + L"\\config.json";
@@ -298,8 +323,8 @@ static void DoInstall(int deviceIndex) {
         }
     }
 
-    // 6. Register startup
-    SetStatus(L"[6/6] Registering startup...");
+    // 7. Register startup
+    SetStatus(L"[7/7] Registering startup...");
     std::wstring startupVal = L"\"" + bridgeDst + L"\"";
     RegSetString(HKEY_CURRENT_USER, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", TASK_NAME, startupVal.c_str());
 

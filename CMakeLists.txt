@@ -15,6 +15,7 @@ add_executable(rime_bridge
     src/audio/IpcAudioClient.cpp
     src/audio/WASAPICapture.cpp
     src/audio/WASAPIKeepAlive.cpp
+    src/audio/WASAPIOutput.cpp
     src/audio/RingBuffer.cpp
     src/audio/OscProxy.cpp
     src/vst/VSTHost.cpp

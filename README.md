@@ -7,39 +7,29 @@ This project allows RIME to be used without a DAW. You will still need to own RI
 
 ## Quick Install
 
-1. **Build the project** (requires CMake + Visual Studio 2022):
-   ```powershell
-   cmake -S . -B build -G "Visual Studio 17 2022"
-   cmake --build build --config Release
-   ```
-
-2. **Run the installer** (as Administrator):
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File Install.ps1
-   ```
-   This will:
-   - Copy `rime_apo.dll` to System32 and `rime_bridge.exe` to Program Files
-   - Register the APO COM server
-   - Let you choose which audio device to apply RIME to
-   - Create a config file at `%APPDATA%\RIME Standalone\config.json`
-   - Register the bridge to launch automatically on login
-
-3. **That's it.** The bridge will start automatically and the RIME UI will appear.
+1. Download the latest `RIME_Standalone_Release.zip` and extract it to a folder.
+2. Double-click `rime_setup.exe` (it will ask for Administrator privileges).
+3. Select your physical headphones from the dropdown list and click **Install**.
+4. **That's it.** The installer will automatically:
+   - Silently install the VB-Audio Virtual Cable driver.
+   - Inject the RIME APO directly into your selected headphones.
+   - Setup a silent background startup task.
+   - Launch the real-time bridge.
 
 ## Surround Sound support
 Surround support requires the use of VB-CABLE and the Input and Output must be set to 8 channel 16 bit 48000 hz.
 Note, that not all games appear to support funnelling surround sound through VB-CABLE.
 
-Game like Halo MCC, and Pragmata seemed to work. But games like Mirrors Edge 2009, and NieR Replicant ver.1.22474487139… did not despite having advertised surround support.
-I suspect its because VB-Cable doesnt explicitly say its a surround sound device. It simply supports up to 16 channel audio. Different games query this audio device info differently.
+Games like Halo MCC and Pragmata work natively. However, games like Mirrors Edge 2009 and NieR Replicant did not despite having advertised surround support.
+This is likely because VB-Cable simply advertises 8-channel audio rather than specifically identifying as a "Surround 7.1" endpoint.
 
-Long term may have to make our own passthrough driver that advertises 5.1/7.1 surround sound input in addition to the 16 channel audio support.
+### Zero-Config Virtual Ingestion
+RIME Standalone features a fully automated, plug-and-play architecture. 
+Whenever the bridge launches, it automatically queries the Windows Registry to pinpoint exactly where the APO is installed. It then scans all active capture endpoints on your system. If you route audio through **VB-Cable**, **VoiceMeeter**, or just use the **Native APO** directly, the bridge instantly detects the active streams and additively mixes them together into your headphones in real-time. No manual pipeline configuration is required!
 
 ## Uninstall
 
-```powershell
-powershell -ExecutionPolicy Bypass -File Install.ps1 -Uninstall
-```
+Simply run `rime_setup.exe` again and click the **Uninstall** button. It will cleanly remove the APO from your headphones, unregister all COM servers, and remove the background startup tasks.
 
 ## Configuration
 
