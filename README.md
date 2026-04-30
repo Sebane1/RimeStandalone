@@ -25,7 +25,7 @@ This is likely because VB-Cable simply advertises 8-channel audio rather than sp
 
 ### Zero-Config Virtual Ingestion
 RIME Standalone features a fully automated, plug-and-play architecture. 
-Whenever the bridge launches, it automatically queries the Windows Registry to pinpoint exactly where the APO is installed. It then scans all active capture endpoints on your system. If you route audio through **VB-Cable**, **VoiceMeeter**, or just use the **Native APO** directly, the bridge instantly detects the active streams and additively mixes them together into your headphones in real-time. No manual pipeline configuration is required!
+Whenever the bridge launches, it automatically queries the Windows Registry to pinpoint exactly where the APO is installed. It then scans all active capture endpoints on your system. If you route audio through **VB-Cable**, or just use the **Native APO** directly, the bridge instantly detects the active streams and additively mixes them together into your headphones in real-time. No manual pipeline configuration is required!
 
 ## Uninstall
 
