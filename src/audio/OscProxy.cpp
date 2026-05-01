@@ -224,10 +224,16 @@ float OscProxy::applyDriftCorrection(float rawYaw) {
                 while (currentCorrected > 180.0f) currentCorrected -= 360.0f;
                 while (currentCorrected < -180.0f) currentCorrected += 360.0f;
                 
-                // Determine target snap angle by rounding to the nearest 30 degree increment
-                // This divides the full 360 range into 12 discrete resting zones
-                const float SNAP_INTERVAL = 30.0f;
-                float targetYaw = std::round(currentCorrected / SNAP_INTERVAL) * SNAP_INTERVAL;
+                // Determine target snap angle
+                float targetYaw;
+                if (currentCorrected >= -10.0f && currentCorrected <= 10.0f) {
+                    // Strong magnetic snap to true center when looking roughly forward
+                    targetYaw = 0.0f;
+                } else {
+                    // Lock to the nearest 1 degree increment elsewhere
+                    const float SNAP_INTERVAL = 1.0f;
+                    targetYaw = std::round(currentCorrected / SNAP_INTERVAL) * SNAP_INTERVAL;
+                }
                 
                 // Ensure target yaw stays strictly within the standard -180 to 180 range
                 while (targetYaw > 180.0f) targetYaw -= 360.0f;
@@ -241,7 +247,11 @@ float OscProxy::applyDriftCorrection(float rawYaw) {
                 while (offsetError > 180.0f) offsetError -= 360.0f;
                 while (offsetError < -180.0f) offsetError += 360.0f;
                 
-                float maxDrift = m_driftSpeed * m_driftMultiplier * dt;
+                float currentSpeed = m_driftSpeed;
+                if (targetYaw == 0.0f) {
+                    currentSpeed *= 3.0f; // 3x faster correction when snapping to true center
+                }
+                float maxDrift = currentSpeed * m_driftMultiplier * dt;
                 
                 if (std::abs(offsetError) <= maxDrift) {
                     m_driftOffset = targetOffset; // Snapped
