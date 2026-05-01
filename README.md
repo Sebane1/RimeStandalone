@@ -30,11 +30,7 @@ Whenever the bridge launches, it automatically queries the Windows Registry to p
 ## Uninstall
 
 Simply run `rime_setup.exe` again and click the **Uninstall** button. It will cleanly remove the APO from your headphones, unregister all COM servers, and remove the background startup tasks.
-## Uninstall
 
-```powershell
-powershell -ExecutionPolicy Bypass -File Install.ps1 -Uninstall
-```
 ## Surround Sound support
 Surround support requires the use of VB-CABLE and the Input and Output must be set to 8 channel 16 bit 48000 hz.
 Note, that not all games appear to support funnelling surround sound through VB-CABLE.
