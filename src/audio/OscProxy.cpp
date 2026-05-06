@@ -226,7 +226,7 @@ float OscProxy::applyDriftCorrection(float rawYaw) {
                 
                 // Determine target snap angle
                 float targetYaw;
-                if (currentCorrected >= -10.0f && currentCorrected <= 10.0f) {
+                if (currentCorrected >= -15.0f && currentCorrected <= 15.0f) {
                     // Strong magnetic snap to true center when looking roughly forward
                     targetYaw = 0.0f;
                 } else {
